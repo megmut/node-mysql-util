@@ -2,16 +2,16 @@ import { CacheItem } from "./cacheItem";
 
 /**
  * Order Priorities
- * 
+ *
  * 1. newest descending
  * 2. highest called descending
  * 3. manual priority / priority override
- * 
+ *
  * It might be worth having a top x% cache in a separate object / array for the most called query.
  * Manual binary lookup passed from specific routes for single queries
  *  to elaborate, if you have a controller that only ever runs 1 query, you could use that query cache ID passed
- *  in order to order that without needing to hash the query and parameters. 
- * 
+ *  in order to order that without needing to hash the query and parameters.
+ *
  * Creating class objects rather than literal objects is slower. They won't be created all that often,
  *  but it's possible to pre-create empty cache items and store them in a pool to re-use.
  */
@@ -20,7 +20,8 @@ declare interface IGlobalOptions {
     enabled?: boolean; // is it currently running
     maxCacheLifeTime?: number; // how long can each cache item lasts before being nuked
     maxCacheItems?: number; // maximum number of items can be stored
-    maxMemoryCapacity?: number; // maximum amount of memory size before culling cached items from the bottom of the ordered list
+    maxMemoryCapacity?: number; // maximum amount of memory size before culling cached items from the bottom
+    // of the ordered list
     emptyCacheCycle?: number; // how often the whole cache system is emptied
     orderPriority?: number; // in which way to order the objects in cache
     reorderCycle?: number; // how often to run the re-order cycle
@@ -29,9 +30,11 @@ declare interface IGlobalOptions {
     ignoreEnvironmentVariables?: boolean; // if the setup of this module should not look for environment variables
 }
 
+type QueryParameters = number | string | string[];
+
 declare interface ICacheItem {
     hash: string;
-    results: Array<any>;
+    results: any[];
 }
 declare interface IGlobalCache { [queryKey: string]: CacheItem };
 
@@ -52,7 +55,7 @@ export class QueryCache {
             }
         }
 
-        // setup the job to check for expired 
+        // setup the job to check for expired
         if (options.maxCacheLifeTime) {
             this._options.maxCacheLifeTime = options.maxCacheLifeTime;
         } else {
@@ -68,7 +71,7 @@ export class QueryCache {
         }
 
         const timer = setInterval(() => {
-            console.log('clear the cache');
+            // Do something at some point
         }, interval);
 
         return timer;
@@ -86,13 +89,16 @@ export class QueryCache {
      * Has a time complexity of O(n)
      */
     private checkForExpiredCache() {
-        // store this so we don't have to lookup every time. 
-        // negative about doing this is the end of life is calculated against when the cache cycle was begun, not the specific time
+        // store this so we don't have to lookup every time.
+        // negative about doing this is the end of life is calculated against when the cache
+        // cycle was begun, not the specific time
         const curDate: number = Date.now();
-        for (var index in this._cache) {
-            const cacheItem = this._cache[index];
-            if (cacheItem.hasExpired(curDate)) {
-                this.recycleItem(cacheItem);
+        for (const index in this._cache) {
+            if (index != null) {
+                const cacheItem = this._cache[index];
+                if (cacheItem.hasExpired(curDate)) {
+                    this.recycleItem(cacheItem);
+                }
             }
         }
     }
@@ -103,12 +109,12 @@ export class QueryCache {
 
     /**
      * 
-     * @param queryKey 
-     * @param parameters 
+     * @param queryKey
+     * @param parameters
      * 
      * Has a time complexity of O(1)
      */
-    public find(queryKey: string, parameters: Array<number | string | string[]>): CacheItem | null {
+    public find(queryKey: string, parameters:QueryParameters[]): CacheItem | null {
         const hash = this.generateHash(queryKey, parameters);
         // check that there is a base instance of a query cache from the query key
         if (this._cache[hash]) {
@@ -124,7 +130,7 @@ export class QueryCache {
             this.recycleItem(this._cache[hash])
         }
 
-        const maxCacheLifeTime: number = this.options.maxCacheLifeTime? this.options.maxCacheLifeTime : 3600
+        const maxCacheLifeTime: number = this.options.maxCacheLifeTime ? this.options.maxCacheLifeTime : 3600
         const newCacheItem = new CacheItem(this, maxCacheLifeTime);
         this._cache[hash] = newCacheItem
         return newCacheItem;
@@ -138,7 +144,7 @@ export class QueryCache {
         this._cache = {};
     }
 
-    private generateHash(queryKey: string, parameters: Array<number | string | string[]>): string {
+    private generateHash(queryKey: string, parameters: QueryParameters[]): string {
         // need to bench test the join function
         const parameterString = parameters.join('');
         const hash = `${queryKey}-${parameterString}`;
