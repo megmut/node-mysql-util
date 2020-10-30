@@ -37,14 +37,13 @@ declare interface IGlobalCache { [queryKey: string]: CacheItem };
 
 export class QueryCache {
     private _cache: IGlobalCache;
-    private _totalMemory: number;
+    // private _totalMemory: number;
     private _options: IGlobalOptions;
-    private _job: NodeJS.Timeout;
+    // private _job: NodeJS.Timeout;
 
     constructor(options: IGlobalOptions = {}) {
         this._options = options;
-
-        this.init();
+        this._cache = {};
 
         if(options.maxCacheLifeTime) {
             this.initializeFullCacheClearCycle(options.emptyCacheCycle);
@@ -97,10 +96,6 @@ export class QueryCache {
 
     public recycleItem(cachedItem: CacheItem) {
         // delete the cached item
-    }
-
-    public init(): void {
-        this._cache = {};
     }
 
     /**

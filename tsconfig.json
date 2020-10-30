@@ -5,6 +5,8 @@
         "sourceMap": true,
         "declaration": true,
         "importHelpers": true,
+        "strict": true,
+        "experimentalDecorators": true,
         "target": "ES2015",
         "module": "es6",
         "moduleResolution": "Node"
