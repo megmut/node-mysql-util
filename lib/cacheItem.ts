@@ -4,7 +4,7 @@ export class CacheItem {
     private controller: QueryCache;
     private _endOfLife: number;
 
-    constructor(controller: QueryCache, lifespan: number = controller.options.maxCacheLifeTime) {
+    constructor(controller: QueryCache, lifespan: number) {
         this.controller = controller;
         // inherit the date now from the create hash function to avoid Date.now call twice
         this._endOfLife = lifespan + Date.now();

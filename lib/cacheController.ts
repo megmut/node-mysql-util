@@ -39,18 +39,21 @@ export class QueryCache {
     private _cache: IGlobalCache;
     // private _totalMemory: number;
     private _options: IGlobalOptions;
-    // private _job: NodeJS.Timeout;
+    private _job: number | null;
 
     constructor(options: IGlobalOptions = {}) {
         this._options = options;
         this._cache = {};
+        this._job = null;
 
-        if(options.maxCacheLifeTime) {
-            this.initializeFullCacheClearCycle(options.emptyCacheCycle);
+        if (options.maxCacheLifeTime) {
+            if (options.emptyCacheCycle != null) {
+                this.initializeFullCacheClearCycle(options.emptyCacheCycle);
+            }
         }
 
         // setup the job to check for expired 
-        if(options.maxCacheLifeTime) {
+        if (options.maxCacheLifeTime) {
             this._options.maxCacheLifeTime = options.maxCacheLifeTime;
         } else {
             this._options.maxCacheLifeTime = 14400;
@@ -60,7 +63,7 @@ export class QueryCache {
     }
 
     private initializeFullCacheClearCycle(interval: number): NodeJS.Timeout {
-        if(!interval) {
+        if (!interval) {
             throw new Error('No full cache clear cycle interval was provided');
         }
 
@@ -86,9 +89,9 @@ export class QueryCache {
         // store this so we don't have to lookup every time. 
         // negative about doing this is the end of life is calculated against when the cache cycle was begun, not the specific time
         const curDate: number = Date.now();
-        for(var index in this._cache) {
+        for (var index in this._cache) {
             const cacheItem = this._cache[index];
-            if(cacheItem.hasExpired(curDate)) {
+            if (cacheItem.hasExpired(curDate)) {
                 this.recycleItem(cacheItem);
             }
         }
@@ -105,23 +108,24 @@ export class QueryCache {
      * 
      * Has a time complexity of O(1)
      */
-    public find(queryKey: string, parameters: Array<number | string | string[]>): CacheItem | never {
+    public find(queryKey: string, parameters: Array<number | string | string[]>): CacheItem | null {
         const hash = this.generateHash(queryKey, parameters);
         // check that there is a base instance of a query cache from the query key
-        if(this._cache[hash]) {
+        if (this._cache[hash]) {
             return this._cache[hash];
         } else {
             return null;
         }
     }
 
-    public createCache (hash: string | number): CacheItem {
+    public createCache(hash: string | number): CacheItem {
         // if the hash has already been used, then kill that cached item
-        if(this._cache[hash]) {
+        if (this._cache[hash]) {
             this.recycleItem(this._cache[hash])
         }
 
-        const newCacheItem = new CacheItem(this);
+        const maxCacheLifeTime: number = this.options.maxCacheLifeTime? this.options.maxCacheLifeTime : 3600
+        const newCacheItem = new CacheItem(this, maxCacheLifeTime);
         this._cache[hash] = newCacheItem
         return newCacheItem;
     }
