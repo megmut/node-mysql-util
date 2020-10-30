@@ -1,21 +1,19 @@
 import { Connection, FieldPacket, PoolConnection } from 'mysql2/promise';
-import { MySQLService } from './service';
+import { isPoolConnection } from './utils';
 import { Executions } from './executions';
 
+export class Query {
 
-type dbString = 'auth' | 'crm' | 'scheduler';
-
-export class MySQLUtil {
-
-    public static async ping(dbKey: dbString): Promise<boolean> {
-        const connection = await MySQLService.getInstance().getConnectionFromPool(dbKey);
+    public static async ping(connection: Connection | PoolConnection): Promise<boolean> {
         if (connection == null) {
             const error: string = 'No connection available';
             throw (error);
         }
         try {
             await connection.ping();
-            connection.release();
+            if (isPoolConnection(connection)) {
+                connection.release();
+            }
             return true;
         } catch (error) {
             throw error;
@@ -47,7 +45,7 @@ export class MySQLUtil {
     public static async insertMany(query: string, params: any[], connection: Connection | PoolConnection): Promise<boolean> {
         try {
             const result = await this.execute(query, params, connection);
-            if(result == null) { return false; }
+            if (result == null) { return false; }
             if (result.length > 0 && result[0].insertId != null) {
                 return true;
             } else {

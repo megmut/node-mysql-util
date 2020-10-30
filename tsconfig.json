@@ -4,10 +4,10 @@
         "baseUrl": "lib",
         "sourceMap": true,
         "declaration": true,
-        "moduleResolution": "node",
         "importHelpers": true,
         "target": "ES2015",
-        "module": "commonjs",
+        "module": "es6",
+        "moduleResolution": "Node"
     },
     "exclude": [
         "test.ts",
