@@ -1,4 +1,4 @@
-import { Connection, FieldPacket, Pool, PoolConnection } from 'mysql2/promise';
+import { Connection, Pool, PoolConnection } from 'mysql2/promise';
 export interface IMultipleTransaction {
     id: number;
     query: string;
@@ -61,63 +61,6 @@ export class MySQLService {
             return connection;
         } catch (error) {
             throw error;
-        }
-    }
-
-    public async execute(query: string, params: any[], databaseKey: string): Promise<[any, FieldPacket[]]> {
-        const connection: PoolConnection | null = await this.getConnectionFromPool(databaseKey);
-        if (connection == null) {
-            const error: string = 'No connection available';
-            throw (error);
-        }
-        try {
-            const result = await connection.query(query, params);
-            connection.release();
-            return result;
-        } catch (err) {
-            connection.release();
-            throw err;
-        }
-    }
-
-    public async executeTransaction(query: string, params: any[], databaseKey: string): Promise<[any, FieldPacket[]]> {
-        const connection: PoolConnection | null = await this.getConnectionFromPool(databaseKey);
-        if (connection == null) {
-            const error: string = 'No connection available';
-            throw (error);
-        }
-        try {
-            await connection.beginTransaction();
-            const result: [any, FieldPacket[]] = await connection.query(query, params);
-            await connection.commit();
-            connection.release();
-            return result;
-        } catch (error) {
-            await connection.rollback();
-            connection.release();
-            throw new Error(error);
-        }
-    }
-
-    public async executeMultipleTransactions(queries: IMultipleTransaction[], databaseKey: 'auth' | 'crm' | 'scheduler'): Promise<{ [index: number]: any }> {
-        const connection: PoolConnection | null = await this.getConnectionFromPool(databaseKey);
-        if (connection == null) {
-            const error: string = 'No connection available';
-            throw (error);
-        }
-        try {
-            await connection.beginTransaction();
-            const result: { [index: number]: any } = {};
-            for (const query of queries) {
-                result[query.id] = await connection.query(query.query, query.params);
-            }
-            await connection.commit();
-            connection.release();
-            return result;
-        } catch (error) {
-            await connection.rollback();
-            connection.release();
-            throw new Error(error);
         }
     }
 }
