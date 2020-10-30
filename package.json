@@ -1,0 +1,19 @@
+{
+  "name": "mysql-utils",
+  "version": "0.0.1",
+  "description": "A series of utility functions for MySQL Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node.js",
+    "mysql",
+    "untility"
+  ],
+  "author": "nicholas mordecai",
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^2.2.5"
+  }
+}
