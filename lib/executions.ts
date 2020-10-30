@@ -3,7 +3,7 @@ import { Connection, FieldPacket, PoolConnection } from 'mysql2/promise';
 
 export class Executions {
 
-    public async execute(query: string, params: any[], connection: Connection | PoolConnection): Promise<[any, FieldPacket[]]> {
+    public static async execute(query: string, params: any[], connection: Connection | PoolConnection): Promise<[any, FieldPacket[]]> {
         if (connection == null) {
             const error: string = 'No connection available';
             throw (error);
@@ -22,7 +22,7 @@ export class Executions {
         }
     }
 
-    public async executeTransaction(query: string, params: any[], connection: Connection | PoolConnection): Promise<[any, FieldPacket[]]> {
+    public static async executeTransaction(query: string, params: any[], connection: Connection | PoolConnection): Promise<[any, FieldPacket[]]> {
         if (connection == null) {
             const error: string = 'No connection available';
             throw (error);
@@ -44,7 +44,7 @@ export class Executions {
         }
     }
 
-    public async executeMultipleTransactions(queries: IMultipleTransaction[], connection: Connection | PoolConnection): Promise<{ [index: number]: any }> {
+    public static async executeMultipleTransactions(queries: IMultipleTransaction[], connection: Connection | PoolConnection): Promise<{ [index: number]: any }> {
         if (connection == null) {
             const error: string = 'No connection available';
             throw (error);

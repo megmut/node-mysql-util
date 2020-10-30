@@ -1,5 +1,7 @@
-import { FieldPacket } from 'mysql2';
+import { Connection, FieldPacket, PoolConnection } from 'mysql2/promise';
 import { MySQLService } from './service';
+import { Executions } from './executions';
+
 
 type dbString = 'auth' | 'crm' | 'scheduler';
 
@@ -20,13 +22,15 @@ export class MySQLUtil {
         }
     }
 
-    public static async execute(query: string, params: any[], dbKey: dbString): Promise<[any, FieldPacket[]]> {
-        return MySQLService.getInstance().execute(query, params, dbKey);
+    // TODO count database open connections
+
+    public static async execute(query: string, params: any[], connection: Connection | PoolConnection): Promise<[any, FieldPacket[]]> {
+        return Executions.execute(query, params, connection)
     }
 
-    public static async insertOne(query: string, params: any[], dbKey: dbString): Promise<number | null> {
+    public static async insertOne(query: string, params: any[], connection: Connection | PoolConnection): Promise<number | null> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result == null) {
                 return null;
             }
@@ -40,9 +44,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async insertMany(query: string, params: any[], dbKey: dbString): Promise<boolean> {
+    public static async insertMany(query: string, params: any[], connection: Connection | PoolConnection): Promise<boolean> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if(result == null) { return false; }
             if (result.length > 0 && result[0].insertId != null) {
                 return true;
@@ -54,9 +58,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async selectOne<T>(query: string, params: any[], dbKey: dbString): Promise<T | null> {
+    public static async selectOne<T>(query: string, params: any[], connection: Connection | PoolConnection): Promise<T | null> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result !== null && result[0].length >= 1) {
                 return result[0][0];
             } else {
@@ -67,9 +71,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async selectMany<T>(query: string, params: any[], dbKey: dbString): Promise<T[] | null> {
+    public static async selectMany<T>(query: string, params: any[], connection: Connection | PoolConnection): Promise<T[] | null> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result !== null && result[0].length >= 1) {
                 return result[0];
             } else {
@@ -80,9 +84,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async deleteOne(query: string, params: any[], dbKey: dbString): Promise<boolean> {
+    public static async deleteOne(query: string, params: any[], connection: Connection | PoolConnection): Promise<boolean> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result !== null && result.length > 0 && result[0].affectedRows === 1) {
                 return true;
             } else {
@@ -93,9 +97,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async deleteMany(query: string, params: any[], dbKey: dbString): Promise<boolean> {
+    public static async deleteMany(query: string, params: any[], connection: Connection | PoolConnection): Promise<boolean> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result !== null && result.length > 0 && result[0].affectedRows > 0) {
                 return true;
             } else {
@@ -106,9 +110,9 @@ export class MySQLUtil {
         }
     }
 
-    public static async updateOne(query: string, params: any[], dbKey: dbString): Promise<boolean> {
+    public static async updateOne(query: string, params: any[], connection: Connection | PoolConnection): Promise<boolean> {
         try {
-            const result = await this.execute(query, params, dbKey);
+            const result = await this.execute(query, params, connection);
             if (result !== null && result.length > 0 && result[0].affectedRows === 1) {
                 return true;
             } else {
