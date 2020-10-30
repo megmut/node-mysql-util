@@ -2,14 +2,16 @@
     "compilerOptions": {
         "outDir": "bin/",
         "baseUrl": "lib",
-        "sourceMap": true,
+        "target": "ES2017",
+        "module": "commonjs",
+        "moduleResolution": "node",
         "declaration": true,
-        "importHelpers": true,
+        "sourceMap": true,
         "strict": true,
-        "experimentalDecorators": true,
-        "target": "ES2015",
-        "module": "es6",
-        "moduleResolution": "Node"
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true
     },
     "exclude": [
         "test.ts",
