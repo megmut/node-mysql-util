@@ -13,8 +13,10 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
     },
+    "include": [
+        "lib/**/*"
+    ],
     "exclude": [
-        "test.ts",
-        "**/*.spec.ts"
+        "**/*.test.ts"
     ]
 }

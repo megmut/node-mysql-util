@@ -48,6 +48,9 @@ export class QueryCache {
         this._options = options;
         this._cache = {};
         this._job = null;
+        if (this._job) {
+            // temp tslint fix
+        }
 
         if (options.maxCacheLifeTime) {
             if (options.emptyCacheCycle != null) {
@@ -85,7 +88,7 @@ export class QueryCache {
 
     /**
      * Check for expired cache
-     * 
+     *
      * Has a time complexity of O(n)
      */
     private checkForExpiredCache() {
@@ -105,16 +108,19 @@ export class QueryCache {
 
     public recycleItem(cachedItem: CacheItem) {
         // delete the cached item
+        if(cachedItem) {
+            // temp tslint fix
+        }
     }
 
     /**
-     * 
+     *
      * @param queryKey
      * @param parameters
-     * 
+     *
      * Has a time complexity of O(1)
      */
-    public find(queryKey: string, parameters:QueryParameters[]): CacheItem | null {
+    public find(queryKey: string, parameters: QueryParameters[]): CacheItem | null {
         const hash = this.generateHash(queryKey, parameters);
         // check that there is a base instance of a query cache from the query key
         if (this._cache[hash]) {

@@ -1,10 +1,8 @@
-import { QueryCache } from './cacheController';
-
-export class CacheItem {
-    private controller: QueryCache;
-    private _endOfLife: number;
-
-    constructor(controller: QueryCache, lifespan: number) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CacheItem = void 0;
+class CacheItem {
+    constructor(controller, lifespan) {
         this.controller = controller;
         if (this.controller) {
             // ts lint temp fix
@@ -12,16 +10,17 @@ export class CacheItem {
         // inherit the date now from the create hash function to avoid Date.now call twice
         this._endOfLife = lifespan + Date.now();
     }
-
-    public hasExpired(comparisonDate: number): boolean {
+    hasExpired(comparisonDate) {
         if (this._endOfLife <= comparisonDate) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
-
-    public get endOfLife(): number {
+    get endOfLife() {
         return this._endOfLife;
     }
 }
+exports.CacheItem = CacheItem;
+//# sourceMappingURL=cacheItem.js.map
