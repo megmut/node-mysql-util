@@ -6,3 +6,12 @@ NPM badge
 
 Test Badge
 Coverage Badge
+
+```
+import { selectOne } from 'mysql-utils';
+
+const query: string = 'SELECT * FROM table WHERE row1 = ? AND row2 = ?';
+const params: string[] = ['param1', 'anotherParam];
+
+const result = await selectOne(query, params);
+```
